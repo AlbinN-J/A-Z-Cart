@@ -3,6 +3,7 @@ function addToCart(proId){
         url:'/addToCart/'+proId,
         method: 'get',
         success:(response)=>{
+            // alert(response)
             if(response.status){
                 let count=$('#cartCount').html()
                 count=parseInt(count)+1 

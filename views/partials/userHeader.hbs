@@ -19,18 +19,23 @@
 						<a class='nav-link active' aria-current='page' href='/'>Products</a>
 					</li>
 					<li class='nav-item'>
-						<a class='nav-link' href='/addCart'>Cart <span class="badge bg-success" id="cartCount">{{cartCount}}</span></a>
+						<a class='nav-link' href='/cart'>Cart
+							<span
+								class='badge bg-success'
+								id='cartCount'
+							>{{cartCount}}</span></a>
 					</li>
 					{{#if user}}
-					<li class='nav-item'>
-						<a class='nav-link' href='#'>Orders</a>
-					</li>
+						<li class='nav-item'>
+							<a class='nav-link' href='#'>Orders</a>
+						</li>
 					{{/if}}
 					{{! <li class='nav-item'>
 								<a class='nav-link' href='#'>Cart</a>
 							</li> }}
 
 				</ul>
+
 				<div class='dropdown'>
 					<button
 						class='btn btn-secondary dropdown-toggle'
@@ -39,22 +44,21 @@
 						data-bs-toggle='dropdown'
 						aria-expanded='false'
 					>
-					{{#if user}}
-						{{user.Name}}
-						 {{else}}
-						 Account
-					{{/if}}
-						
+						{{#if user}}
+							{{user.Name}}
+						{{else}}
+							Account
+						{{/if}}
 					</button>
 					<ul class='dropdown-menu' aria-labelledby='dropdownMenuButton1'>
-					{{#if user}}
-						<li><a class='dropdown-item' href='/logout'>Logout</a></li>
-						 {{else}}
-						 <li><a class='dropdown-item' href='/login'>Login</a></li>
-					{{/if}}
-						
+						{{#if user}}
+							<li><a class='dropdown-item' href='/logout'>Logout</a></li>
+						{{else}}
+							<li><a class='dropdown-item' href='/login'>Login</a></li>
+						{{/if}}
 					</ul>
 				</div>
+
 			</div>
 		</div>
 	</nav>
