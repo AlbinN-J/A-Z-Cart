@@ -5,6 +5,7 @@
                 <tr>    
                     <th scope="col">Item</th>
                     <th scope="col">Title</th>
+                    <th scope="col">Price</th>
                     <th scope="col">Quantity</th>
                 </tr>
             </thead>
@@ -14,6 +15,7 @@
                     
                     <td><img style="width:70px; height:70px;" src="/productImages/{{this.product._id}}.jpg" alt=""></td>
                     <td>{{this.product.Name}}</td>
+                    <td>{{this.product.Price}}</td>
                     
                     <td>
                         <button class="cart-item-count mr-3 btn btn-info" onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1)">-</button>  
