@@ -199,7 +199,7 @@ module.exports = {
 					)
 					.then((response) => {
 						// console.log(response);
-						resolve(true);
+						resolve({status:true});
 					});
 			}
 		});
@@ -238,18 +238,47 @@ module.exports = {
 						},
 					},
 					{
-						$project:{
+						$group:{
+							_id:null,
 							total:{
 								$sum:{
-									$multiply:[(toInt='$quantity'),(toInt='$product.Price')]
+									$multiply:[{$toInt:'$quantity'},{$toInt:'$product.Price'}]
 								}
 							}
 						}
 					}
 				])
 				.toArray();
-			console.log(total);
-			resolve(total);
+			// console.log(total[0].total);
+			resolve(total[0].total);
 		});
+	},
+	placeOrder:(order,products,total)=>{
+		return new Promise((resolve, reject)=>{
+			console.log(order,products,total);
+			let status=order['payment-method']==='cod'?'placed':'pending'
+			let orderObj={
+				deliveryDetails:{
+					phone:order.phone,
+					address:order.address,
+					pincode:order.pincode
+				},
+				userId:objectId(order.userId),
+				paymentMethod:order['payment-method'],
+				products:products,
+				totalamount:total,
+				status:status
+			}
+			db.get().collection(collection.ORDER_COLLECTION).insertOne(orderObj).then((response) => {
+				db.get().collection(collection.CART_COLLECTION).deleteOne({user:objectId(order.userId)})
+				resolve(response)
+			})
+		})
+	},
+	getCartProductList:(userId)=>{
+		return new Promise(async(resolve, reject)=>{
+			let cart=await db.get().collection(collection.CART_COLLECTION).findOne({user:objectId(userId)})
+				resolve(cart.products)
+		})
 	}
 };

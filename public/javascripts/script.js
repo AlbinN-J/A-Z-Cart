@@ -13,3 +13,6 @@ function addToCart(proId){
         }
     })
 }
+
+
+
