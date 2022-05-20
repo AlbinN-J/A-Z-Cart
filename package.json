@@ -19,6 +19,7 @@
     "mongodb": "^4.5.0",
     "morgan": "~1.9.1",
     "nodemon": "^2.0.16",
-    "promise": "^8.1.0"
+    "promise": "^8.1.0",
+    "razorpay": "^2.8.1"
   }
 }

@@ -6,6 +6,15 @@ const bcrypt = require('bcrypt');
 
 var objectId = require('mongodb').ObjectId;
 
+var paymentKey=require('../config/paymentKey');
+
+const Razorpay=require('razorpay');
+
+var instance = new Razorpay({
+	key_id:paymentKey.KEY_ID,
+	key_secret:paymentKey.KEY_SECRET
+})
+
 module.exports = {
 	doSignup: (userData) => {
 		return new Promise(async (resolve, reject) => {
@@ -267,11 +276,13 @@ module.exports = {
 				paymentMethod:order['payment-method'],
 				products:products,
 				totalamount:total,
-				status:status
+				status:status,
+				date:new Date()
 			}
 			db.get().collection(collection.ORDER_COLLECTION).insertOne(orderObj).then((response) => {
 				db.get().collection(collection.CART_COLLECTION).deleteOne({user:objectId(order.userId)})
-				resolve(response)
+				console.log("order id:",response.insertedId._id);
+				resolve(response.insertedId._id)
 			})
 		})
 	},
@@ -279,6 +290,68 @@ module.exports = {
 		return new Promise(async(resolve, reject)=>{
 			let cart=await db.get().collection(collection.CART_COLLECTION).findOne({user:objectId(userId)})
 				resolve(cart.products)
+		})
+	},
+	getUserOrders:(userId)=>{
+		return new Promise(async(resolve, reject)=>{
+			console.log(userId);
+			let orders=await db.get().collection(collection.ORDER_COLLECTION).find({userId:objectId(userId)}).toArray()
+			console.log(orders);
+			resolve(orders)
+		})
+	},
+	getOrderProducts:(orderId)=>{
+		return new Promise(async (resolve, reject) => {
+			let orderItems = await db
+				.get()
+				.collection(collection.ORDER_COLLECTION)
+				.aggregate([
+					{
+						$match: { _id: objectId(orderId) },
+					},
+					{
+						$unwind: '$products',
+					},
+					{
+						$project: {
+							item: '$products.item',
+							quantity: '$products.quantity',
+						},
+					},
+					{
+						$lookup: {
+							from: collection.PRODUCT_COLLECTION,
+							localField: 'item',
+							foreignField: '_id',
+							as: 'product',
+						},
+					},
+					{
+						$project: {
+							item: 1,
+							quantity: 1,
+							product: { $arrayElemAt: ['$product', 0] },
+						},
+					},
+					
+				])
+				.toArray();
+			console.log(orderId);
+			resolve(orderItems);
+		});
+	},
+	generateRazorpay:(orderId,total)=>{
+		console.log(orderId);
+		return new Promise((resolve, reject)=>{
+			var options = {
+				amount:total,
+				currency:'INR',
+				receipt:'order'+orderId
+			};
+			instance.orders.create(options,(err,order)=>{
+				console.log("order:",order);
+				resolve(order);
+			})
 		})
 	}
 };
